@@ -2,7 +2,6 @@ package com.SpringBootProject.AirBnB.controllers;
 
 
 import com.SpringBootProject.AirBnB.dto.HotelDto;
-import com.SpringBootProject.AirBnB.repository.HotelRepository;
 import com.SpringBootProject.AirBnB.service.HotelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +58,7 @@ public class HotelController {
                 .build();
     }
 
-    @PatchMapping("/{hotelId}")
+    @PatchMapping("/{hotelId}/activate")
     public ResponseEntity<Void> activateHotelId(@PathVariable Long hotelId)
     {
         hotelService.activateHotel(hotelId);

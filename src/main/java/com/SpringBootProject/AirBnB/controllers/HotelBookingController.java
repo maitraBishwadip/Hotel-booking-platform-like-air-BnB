@@ -3,15 +3,15 @@ package com.SpringBootProject.AirBnB.controllers;
 
 import com.SpringBootProject.AirBnB.dto.BookingDto;
 import com.SpringBootProject.AirBnB.dto.BookingRequest;
+import com.SpringBootProject.AirBnB.dto.GuestDto;
 import com.SpringBootProject.AirBnB.entity.Booking;
 import com.SpringBootProject.AirBnB.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/booking")
@@ -21,22 +21,36 @@ public class HotelBookingController {
 
     private final BookingService bookingService;
 
-@PostMapping(value = "/init")
-    public ResponseEntity<BookingDto> initialiseBooking(@RequestBody BookingRequest bookingrequest){
+    @PostMapping(value = "/init")
+    public ResponseEntity<BookingDto> initialiseBooking(@RequestBody BookingRequest bookingrequest) {
 
-   return ResponseEntity.
-           status(200)
-           .body(bookingService.initializeBooking(bookingrequest));
-
-
-
-
-
-
-
+        return ResponseEntity.
+                status(200)
+                .body(bookingService.initializeBooking(bookingrequest));
 
     }
 
 
+    @PostMapping("/{bookingId}/addGuests")
+    public ResponseEntity<BookingDto> addGuests(@PathVariable Long bookingId,
+                                                @RequestBody List<GuestDto> guestDtoList) {
 
+
+        return ResponseEntity.
+                status(200)
+                .body(bookingService.addGuests(bookingId, guestDtoList));
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
