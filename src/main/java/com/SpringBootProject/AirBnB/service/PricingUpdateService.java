@@ -38,35 +38,44 @@ public class PricingUpdateService {
 @Scheduled(cron = "0 0 * * * *")
     public void updatePrices()
     {
+      log.info("Starting price update job");
       int page = 0 ;
       int batchSize = 100;
 
       while(true)
       {
+          log.info("Processing page: {}", page);
           Page<Hotel> hotelPage = hotelrepository.findAll(PageRequest.of(page, batchSize));
-          if(hotelPage.isEmpty())
+          if(hotelPage.isEmpty()){
+              log.info("No more hotels to process. Exiting.");
               break;
+          }
           hotelPage.forEach(this::updateHotelPrices);
 
          page++;
       }
+      log.info("Finished price update job");
 
     }
 
     private void updateHotelPrices(Hotel hotel)
     {
+        log.info("Updating prices for hotel: {}", hotel.getId());
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = startDate.plusYears(1);
 
        List<Inventory> inventoryList = inventoryRepository.findByHotelDateBetween(hotel, startDate, endDate);
+        log.info("Found {} inventory items to update for hotel: {}", inventoryList.size(), hotel.getId());
 
        updateInventoryPrices(inventoryList);
        updateHotelMinPrice(hotel,inventoryList,startDate,endDate);
+       log.info("Finished updating prices for hotel: {}", hotel.getId());
 
 
     }
 
     private void updateHotelMinPrice(Hotel hotel, List<Inventory> inventoryList, LocalDate startDate, LocalDate endDate) {
+        log.info("Updating hotel min price for hotel: {}", hotel.getId());
         Map<LocalDate, BigDecimal> dailyMinPrices = inventoryList.stream()
                 .collect(Collectors.groupingBy(
                    Inventory::getDate,
@@ -74,6 +83,7 @@ public class PricingUpdateService {
                   ))
                 .entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().orElse(BigDecimal.ZERO)));
+        log.info("Calculated {} daily min prices for hotel: {}", dailyMinPrices.size(), hotel.getId());
 List<HotelMinPrice> hotelPrices = new ArrayList<>();
 dailyMinPrices.forEach((date,price) -> { HotelMinPrice hotelPrice = hotelMinPriceRepository.findByHotelAndDate(hotel,date)
 .orElse(new HotelMinPrice(hotel,date));
@@ -81,31 +91,18 @@ hotelPrice.setPrice(price);
 hotelPrices.add(hotelPrice);
 });
 hotelMinPriceRepository.saveAll(hotelPrices);
+log.info("Saved {} hotel min prices for hotel: {}", hotelPrices.size(), hotel.getId());
     }
 
     private void updateInventoryPrices(List<Inventory> inventoryList) {
+        log.info("Updating {} inventory items", inventoryList.size());
         inventoryList.forEach(inventory->{
+            log.debug("Updating inventory item: {}", inventory.getId());
             BigDecimal dynamicPrice = pricingservice.calculateDynamicPricing(inventory);
             inventory.setPrice(dynamicPrice);
             inventoryRepository.save(inventory);
+            log.debug("Saved inventory item: {}", inventory.getId());
         });
+        log.info("Finished updating inventory items");
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
