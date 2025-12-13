@@ -3,6 +3,7 @@ package com.SpringBootProject.AirBnB.controllers;
 
 import com.SpringBootProject.AirBnB.dto.HotelDto;
 import com.SpringBootProject.AirBnB.dto.HotelInfoDto;
+import com.SpringBootProject.AirBnB.dto.HotelPriceDto;
 import com.SpringBootProject.AirBnB.dto.HotelSearchRequest;
 import com.SpringBootProject.AirBnB.service.HotelService;
 import com.SpringBootProject.AirBnB.service.InventoryService;
@@ -23,10 +24,10 @@ public class HotelBrowseController {
     private final HotelService hotelService;
 
     @GetMapping("/search")
-    public ResponseEntity<Page<HotelDto>> searchHotels(@RequestParam HotelSearchRequest hotelSearchRequest)
+    public ResponseEntity<Page<HotelPriceDto>> searchHotels(@RequestParam HotelSearchRequest hotelSearchRequest)
     {
 
-        Page<HotelDto> page =  inventoryService.searchHotels(hotelSearchRequest);
+        Page<HotelPriceDto> page =  inventoryService.searchHotels(hotelSearchRequest);
 
         return ResponseEntity
                 .status(200)
