@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,8 +35,8 @@ public class PricingUpdateService {
    private final PricingService pricingservice;
 
 
-
-    public void updatePrice()
+@Scheduled(cron = "0 0 * * * *")
+    public void updatePrices()
     {
       int page = 0 ;
       int batchSize = 100;
