@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +31,8 @@ public class HotelServiceImpl implements HotelService {
         log.info("HotelServiceImpl.createNewHotel");
         Hotel hotel = modelMapper.map(hotelDto, Hotel.class);
         hotel.setActive(false);
+        User user = (SecurityProperties.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        hotel.setOwner(user); //Todo: import the db user
         hotel = hotelRepository.save(hotel);
         log.info("HotelServiceImpl.createNewHotel - Hotel created with id: " + hotel.getId());
         return modelMapper.map(hotel, HotelDto.class);

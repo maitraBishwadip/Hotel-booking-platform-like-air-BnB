@@ -8,11 +8,13 @@ import com.SpringBootProject.AirBnB.entity.*;
 import com.SpringBootProject.AirBnB.entity.enums.BookingStatus;
 import com.SpringBootProject.AirBnB.exception.ResourceNotFoundException;
 import com.SpringBootProject.AirBnB.repository.*;
+import com.SpringBootProject.AirBnB.exception.UnAuthorisedException;
 import jakarta.transaction.Transactional;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -35,6 +37,7 @@ public class BookingServiceImpl implements BookingService {
     private final RoomRepository roomRepository;
     private final InventoryRepository inventoryRepository;
     private ModelMapper modelMapper;
+    User user = getCurrentUser();
 
 
     @Override
@@ -71,8 +74,7 @@ public class BookingServiceImpl implements BookingService {
         // Create The Booking Entity and save it to the database
 
         //TODO Remote the temporary User after authorized User is created
-        User user = new User();
-        user.setId(1L); // Temporary User ID
+        //Temporary User ID
 
 
         //TODO : Calculate Dynamic Price and set it to Booking Later on
@@ -104,6 +106,11 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + bookingId));
 
+        if(!user.equals(booking.getUser())) {
+            throw new UnAuthorisedException("Booking does not belong to the current user" +user.getId());
+
+        }
+
         if (hasBookingExpired(booking)) {
             throw new IllegalStateException("Cannot add guests. Booking has expired.");
         }
@@ -132,5 +139,10 @@ public class BookingServiceImpl implements BookingService {
 
     public boolean hasBookingExpired(Booking booking) {
         return booking.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now());
+    }
+
+    public User getCurrentUser()
+    {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
