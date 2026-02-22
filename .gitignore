@@ -31,5 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
-src/main/resources/application.properties
+D:\d drive\Spring boot\AirBnB Projects\AirBnB\src\main\resources\application.properties
 .env
