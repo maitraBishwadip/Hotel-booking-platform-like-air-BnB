@@ -1,5 +1,6 @@
 package com.SpringBootProject.AirBnB;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -10,6 +11,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class AirBnBApplication {
 
 	public static void main(String[] args) {
+		Dotenv dotenv = Dotenv.configure()
+				.directory("./")
+				.load();
+
+		dotenv.entries().forEach(entry -> {
+			System.setProperty(entry.getKey(), entry.getValue());
+		});
+
 		SpringApplication.run(AirBnBApplication.class, args);
 	}
 
